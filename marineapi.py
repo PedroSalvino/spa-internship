@@ -18,9 +18,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 
-# calculo de distancia
-import geopy.distance
-
 #api = MarineTrafficApi(api_key='{chaveapi}')
 #url = 'https://services.marinetraffic.com/api/shipsearch/{api_key}?protocol=json&shipid={ship_id}'.format('{chavedaapi}, {iddonavio}')
 
@@ -33,6 +30,7 @@ app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2
 firebase_admin.initialize_app(app_firebase)
 firebase_db = firestore.client()
 
+# funcao para obtencao do shipid (marinetraffic)
 def obter_ship_id(nome):
 
     navio = nome.replace(' ','%20')
@@ -49,10 +47,10 @@ def obter_ship_id(nome):
     ship_id,e,f = c.partition('/')
     return(ship_id)
 
+# funcao para obter dados dos navios via marinetraffic
 def obter_dados_navio(ship_id):
 
     url1 = 'https://www.marinetraffic.com/en/vesselDetails/vesselInfo/shipid:{}'.format(ship_id)
-    print(url1)
     url2 = 'https://www.marinetraffic.com/en/vesselDetails/latestPosition/shipid:{}'.format(ship_id)
 
     # headers para possibilitar acesso do script ao marinetraffic
@@ -68,9 +66,9 @@ def obter_dados_navio(ship_id):
     resultado = {}
     resultado.update(query1.json())
     resultado.update(query2.json())
-    print(resultado)
     return resultado
 
+# funcao para inserir registros no firebase
 def registrar_firebase(dados):
 
     mmsi = (str({dados["mmsi"]}))
@@ -79,28 +77,19 @@ def registrar_firebase(dados):
     mmsi2 = mmsi2.replace('}','')
     timestamp = datetime.fromtimestamp(dados["lastPos"])
     print(timestamp)
-    eta = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
-    print(eta)
+    estimated_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
+    print(estimated_marine)
     ships = firebase_db.collection("ships")
     ships.document(mmsi2).set({
         "mmsi": mmsi2,
-        "timestamp":timestamp,
+        "latest_update":timestamp,
+        "estimated_marinetraffic":estimated_marine,
+        "estimated_terminal":'',
         "content":dados
     })
 
-    # cordenada_atual = (f'{dados["lat"]}',f'{dados["lon"]}')
-    # coordenada_ilha = ('-24.007947','-46.326595')
-    # distancia_km = geopy.distance.geodesic(cordenada_atual, coordenada_ilha).km
-    # velocidade_km = dados["speed"] * 1.852
-    # tempo_estimado = distancia_km/velocidade_km
-    # print(f'O tempo estimado é {tempo_estimado} horas')
-    # print(f'O tempo estimado é {tempo_estimado/24} dias')
-
-
-
-
+# navio teste
 nome = 'CAP SAN LORENZO'
 ship_id = obter_ship_id(nome)
-print(ship_id)
 dados = obter_dados_navio(ship_id)
 registrar_firebase(dados)
