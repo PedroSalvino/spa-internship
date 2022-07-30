@@ -8,17 +8,15 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { HomeComponent } from './home/home.component';
 import { PainelComponent } from './painel/painel.component';
 import { RouterModule } from '@angular/router';
-import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent },
+      { path: '', component: PainelComponent },
       { path: 'painel', component: PainelComponent },
     ]),
-    GoogleMapsModule,
   ],
   declarations: [
     AppComponent,
