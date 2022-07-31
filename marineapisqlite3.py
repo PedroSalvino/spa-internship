@@ -41,7 +41,8 @@ def criartabela_santosbrasil():
     movimentacao_descarga TEXT,
     movimentacao_total TEXT,
     estimado_saida TEXT,
-    atrasado TEXT
+    atrasado TEXT,
+    shipid TEXT
     ) """)
     conn.commit()
     c.execute(
@@ -64,7 +65,8 @@ def criartabela_santosbrasil():
     movimentacao_descarga TEXT,
     movimentacao_total TEXT,
     chegada_saida TEXT,
-    atrasado TEXT
+    atrasado TEXT,
+    shipid TEXT
     ) """)
     conn.commit()
 
