@@ -95,7 +95,7 @@ while('true'):
                     bordo_prac = elements[7].text
                     tug_prac = elements[8].text
                 except:
-                    print('Não encontrado linha 89')
+                    print('Não encontrado linha 98')
 
     navegador.get('https://www.sppilots.com.br/?act=TABMAR')
     page_content = navegador.page_source
@@ -111,7 +111,7 @@ while('true'):
                 horario_prac = elements[0].text
                 mare_prac = elements[1].text
             except:
-                print('Não encontrado linha 105')
+                print('Não encontrado linha 114')
     
     navegador.get('https://www.sppilots.com.br/?act=FUND')
     page_content = navegador.page_source
@@ -119,7 +119,7 @@ while('true'):
     try:
         navios = soup.find('div', attrs={'style': 'width: 100%;'}).findAll('tr')
     except:
-        print("Não encontrado linha 113")
+        print("Não encontrado linha 122")
     else:
         for manobra in navios:
             elements = manobra.findAll('td')
@@ -127,14 +127,14 @@ while('true'):
                 nome_prac_fund = elements[0].text
                 data_prac_fund = elements[1].text
             except:
-                print('Não encontrado linha 122')
+                print('Não encontrado linha 130')
 
     page = requests.get('https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracacoes-programadas/')
     soup = BeautifulSoup(page.content, 'html.parser')
     try:
         navios = soup.find('div', attrs={'id': 'iniciodoconteudo'}).findAll('div', attrs={'style': 'overflow-x:auto;margin-bottom:20px;'})
     except:
-        print('Não encontrado linha 128')
+        print('Não encontrado linha 137')
     else:
         for navio in navios:
             navios_rows = navio.find('tbody').findAll('tr')
