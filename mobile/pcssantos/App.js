@@ -38,7 +38,7 @@ export default function App() {
       }) }
  tabBarOptions={{
         style:{
-          backgroundColor: '#6290C3',
+          backgroundColor: '#0eb876',
           
         },
         inactiveTintColor: "#FFF",

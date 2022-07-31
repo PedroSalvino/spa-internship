@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList  } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Linking  } from 'react-native';
 
 const outputFundeio = {
   "name": "output_fundeio",
@@ -103,15 +103,11 @@ const outputFundeio = {
 const santosbrasil = {
   "name": "output_santosbrasil",
   "features": [
-  {"nome": "NORTHERN PRIORITY", "mmsi": "636091832", "ultima_atualizacao": "2022-07-31 00:44:29", "estimado_marinetraffic": "2022-07-31 09:00:00", "estimado_terminal": "2022-07-31 09:00:00", "berco": "1", "comprimento": "264.28", "comprimento_maximo": "245", "imo": "9450313", "calado": "10.2", "lat": "-23.4018", "lon": "-43.90191", "movimentacao_embarque": "706", "movimentacao_descarga": "318", "movimentacao_total": "1024", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "SAN FELIPE", "mmsi": "538005732", "ultima_atualizacao": "2022-07-24 18:20:19", "estimado_marinetraffic": "2022-08-01 14:00:00", "estimado_terminal": "2022-08-01 06:00:00", "berco": "2", "comprimento": "299.9", "comprimento_maximo": "383", "imo": "9698628", "calado": "13.9", "lat": "-32.96366", "lon": "6.239763", "movimentacao_embarque": "293", "movimentacao_descarga": "1979", "movimentacao_total": "2272", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "CMA CGM FORT ST GEORGES", "mmsi": "710005274", "ultima_atualizacao": "2022-07-31 02:48:45", "estimado_marinetraffic": "2022-08-01 10:00:00", "estimado_terminal": "2022-08-01 13:00:00", "berco": "1", "comprimento": "197.2", "comprimento_maximo": "245", "imo": "9261918", "calado": "9.2", "lat": "-21.0586", "lon": "-40.29008", "movimentacao_embarque": "514", "movimentacao_descarga": "1979", "movimentacao_total": "2272", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "KOTA CANTIK", "mmsi": "563149900", "ultima_atualizacao": "2022-07-31 05:30:05", "estimado_marinetraffic": "2022-07-31 10:30:00", "estimado_terminal": "2022-08-01 22:00:00", "berco": "3", "comprimento": "299.95", "comprimento_maximo": "350", "imo": "9494591", "calado": "10.5", "lat": "-26.28548", "lon": "-48.3635", "movimentacao_embarque": "554", "movimentacao_descarga": "1979", "movimentacao_total": "2272", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "MONTE CERVANTES", "mmsi": "563051200", "ultima_atualizacao": "2022-07-31 06:17:23", "estimado_marinetraffic": "2022-08-01 08:00:00", "estimado_terminal": "2022-08-02 01:00:00", "berco": "2", "comprimento": "272", "comprimento_maximo": "383", "imo": "9283186", "calado": "9.8", "lat": "-33.62117", "lon": "-52.28421", "movimentacao_embarque": "985", "movimentacao_descarga": "1979", "movimentacao_total": "2272", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "AL SAFAT", "mmsi": "636017670", "ultima_atualizacao": "2022-07-30 17:58:38", "estimado_marinetraffic": "2022-08-03 12:00:00", "estimado_terminal": "2022-08-02 12:00:00", "berco": "2", "comprimento": "306", "comprimento_maximo": "383", "imo": "9349497", "calado": "10.4", "lat": "-8.736645", "lon": "-34.77029", "movimentacao_embarque": "333", "movimentacao_descarga": "0", "movimentacao_total": "333", "estimado_saida": "", "atrasado": "0" },
-  {"nome": "MONTE AZUL", "mmsi": "563051700", "ultima_atualizacao": "2022-07-30 17:24:54", "estimado_marinetraffic": "2022-08-02 23:00:00", "estimado_terminal": "2022-08-03 01:00:00", "berco": "3", "comprimento": "272", "comprimento_maximo": "350", "imo": "9348053", "calado": "9.6", "lat": "-8.56385", "lon": "-34.62025", "movimentacao_embarque": "621", "movimentacao_descarga": "0", "movimentacao_total": "333", "estimado_saida": "", "atrasado": "0" }
+  { "nome": "SAN FELIPE", "mmsi": "538005732", "ultima_atualizacao": "2022-07-24 18:20:19", "estimado_marinetraffic": "2022-08-01 14:00:00", "estimado_terminal": "2022-08-01 06:00:00", "berco": "2", "comprimento": "299.9", "comprimento_maximo": "383", "imo": "9698628", "calado": "13.9", "lat": "-32.96366", "lon": "6.239763", "armador": "ZIM             ", "movimentacao_embarque": "293", "movimentacao_descarga": "1979", "movimentacao_total": "2272", "estimado_saida": "", "atrasado": "0", "shipid": "714723" },
+  { "nome": "CMA CGM FORT ST GEORGES", "mmsi": "710005274", "ultima_atualizacao": "2022-07-31 02:48:45", "estimado_marinetraffic": "2022-08-01 10:00:00", "estimado_terminal": "2022-08-01 13:00:00", "berco": "1", "comprimento": "197.2", "comprimento_maximo": "245", "imo": "9261918", "calado": "9.2", "lat": "-21.0586", "lon": "-40.29008", "armador": "MER             ", "movimentacao_embarque": "533", "movimentacao_descarga": "684", "movimentacao_total": "1217", "estimado_saida": "", "atrasado": "0", "shipid": "171641" },
+  { "nome": "KOTA CANTIK", "mmsi": "563149900", "ultima_atualizacao": "2022-07-31 09:42:46", "estimado_marinetraffic": "2022-07-31 10:30:00", "estimado_terminal": "2022-08-01 22:00:00", "berco": "3", "comprimento": "299.95", "comprimento_maximo": "350", "imo": "9494591", "calado": "10.5", "lat": "-26.827", "lon": "-48.46075", "armador": "PIL             ", "movimentacao_embarque": "710", "movimentacao_descarga": "684", "movimentacao_total": "1217", "estimado_saida": "", "atrasado": "0", "shipid": "732854" }
   ]
-};
+  };
 
 const santosBrasilChegada = {
   "name": "output_santosbrasil_chegada",
@@ -123,7 +119,7 @@ const santosBrasilChegada = {
   { "nome": "COSCO SHIPPING VISION", "mmsi": "477696900", "ultima_atualizacao": "2022-07-31 06:18:46", "chegada_marinetraffic": "2022-07-27 07:31:00", "chegada_terminal": "--", "berco": "1", "comprimento": "201.8", "comprimento_maximo": "245", "imo": "9881677", "calado": "7.5", "lat": "-23.97371", "lon": "-46.29358", "movimentacao_embarque": "333", "movimentacao_descarga": "0", "movimentacao_total": "333", "chegada_saida": "", "atrasado": "0" },
   { "nome": "EVER URBAN", "mmsi": "357939000", "ultima_atualizacao": "2022-07-31 06:04:24", "chegada_marinetraffic": "2022-07-30 02:00:00", "chegada_terminal": "--", "berco": "3", "comprimento": "285", "comprimento_maximo": "350", "imo": "9169160", "calado": "11.3", "lat": "-25.63767", "lon": "-48.18599", "movimentacao_embarque": "621", "movimentacao_descarga": "0", "movimentacao_total": "333", "chegada_saida": "", "atrasado": "0" }
   ]
-  };
+};
 
 const praticagem = {
   "name": "output_praticagem",
@@ -133,7 +129,6 @@ const praticagem = {
   { "nome": "CANADIAN HIGHWAY", "tempo_estimado": "06:10:00" }
   ]
 };
-  
 
 export default function Chegada() {
 
@@ -142,12 +137,15 @@ export default function Chegada() {
       <View style={
        styles.card
       }>
-        <Text>IMO: {item.imo}</Text>
-        <br/>
-        <Text>Navio: {item.nome}</Text>
-        <br/>
-        <Text>{item.chegada_fundeio}</Text>
-
+        <Text style={styles.texto}>IMO: {item.imo}</Text>
+        <Text style={styles.texto}>Navio: {item.nome}</Text>
+        <Text style={styles.texto}>Armador: {item.armador}</Text>
+        <Text style={styles.texto}>Berço: {item.berco}</Text>
+        <Text style={styles.texto}>Quantidade de Container para Descarga: {item.movimentacao_descarga}</Text>
+        <Text style={styles.texto}>Previsão de Chegada na barra: {item.estimado_terminal}</Text>
+        <Text style={styles.texto}>Previsão de Chegada do Marine Traffic: {item.estimado_marinetraffic}</Text>
+        <Pressable style={styles.botao}  onPress={() => Linking.openURL('https://www.marinetraffic.com/en/ais/home/shipid:'+item.shipid+'/zoom:14')}>
+          <Text style={styles.textoBotao}>Exibir no Marine Traffic</Text></Pressable>
       </View>
     );
   };
@@ -157,13 +155,13 @@ export default function Chegada() {
   }, []);
 
  return (
-   <View>
-     <Text>Confirmação de Chegada na barra</Text>
+   <View style={styles.container}>
+     <Text style={styles.titulo}>Confirmação de Chegada na barra</Text>
     
      <FlatList 
         horizontal={true}
         data={santosbrasil.features}
-        renderItem={ renderChegadas}
+        renderItem={renderChegadas}
         />
    </View>
   );
@@ -171,19 +169,37 @@ export default function Chegada() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30
+    padding: 30,
+    backgroundColor: '#1F1F1F',
   },
   card:{
-    backgroundColor: '#F9F5E3',
+    backgroundColor: '#FBFCFF',
     marginVertical: 25,
     marginHorizontal: 15,
     padding: 25,
+    borderRadius: 35,
+  },
+  titulo:{
+    color: '#6290C3',
+    fontSize: 25,
+    fontWeight: 500,
     textAlign: 'center'
   },
-  tituloCard:{
-    color: '#EF798A',
-    fontSize: 20,
-    fontWeight: 500,
+  texto:{
+    textAlign: 'left',
+    marginBottom: 10,
+    fontWeight: '500'
   },
-
+  botao:{
+    backgroundColor: "#6290C3",
+    padding: 15,
+    borderRadius: 25,
+    width: "80%",
+    marginHorizontal: 'auto'
+  },
+  textoBotao:{
+    textAlign: 'center',
+    color: "#FBFCFF",
+    fontSize: 15
+  }
 });

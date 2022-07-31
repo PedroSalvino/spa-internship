@@ -8,7 +8,7 @@ export default function Home() {
 
      <Image
       source={{ uri: 'https://raw.githubusercontent.com/PedroSalvino/spa-internship/mobile/mobile/pcssantos/src/assets/logo-pcs.png'}}
-      style={{ width: 150, height: 150, borderRadius: 30, marginHorizontal: 'auto'}}
+      style={{ width: 350, height: 350, borderRadius: 30, marginHorizontal: 'auto'}}
      />
 
       <View>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 30,
-    margin:0,
+    marginVertical: 'auto',
     backgroundColor: "#1F1F1F"
   },
   titulo:{
