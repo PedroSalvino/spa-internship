@@ -35,7 +35,9 @@ def criartabela_santosbrasil():
     lon TEXT,
     movimentacao_embarque TEXT,
     movimentacao_descarga TEXT,
-    movimentacao_total TEXT
+    movimentacao_total TEXT,
+    estimado_saida TEXT,
+    atrasado TEXT
     ) """)
 
 
@@ -105,7 +107,7 @@ def obter_dados_navio(ship_id):
     return resultado
 
 # funcao para inserir registros no firebase
-def registrar_sqlite(dados, estimado_terminal, chegada_terminal, berco, movimentacao_total, movimentacao_embarque, movimentacao_descarga):
+def registrar_sqlite(dados, estimado_terminal, chegada_terminal, berco, movimentacao_total, movimentacao_embarque, movimentacao_descarga, estimado_saida, atrasado):
     estimado_terminal = str(estimado_terminal).replace('\n','').replace('/n','')
     estimado_terminal = datetime.strptime(estimado_terminal, '%d/%m/%Y%H:%M')
     estimado_terminal = estimado_terminal.strftime('%Y-%m-%d %H:%M:%S')
@@ -144,13 +146,13 @@ def registrar_sqlite(dados, estimado_terminal, chegada_terminal, berco, moviment
         estimado_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         estimado_marine = datetime.strftime(estimado_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}'))""")
         conn.commit()
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
         chegada_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}')""")
         conn.commit()
 
 
@@ -237,7 +239,7 @@ def scraping_praticagem():
 
                 
 
-def scraping_santosbrasil():
+def scraping_santosbrasil(date_time_str):
     navegador.get(f'https://www.santosbrasil.com.br/v2021/lista-de-atracacao?titulo=Tecon+Santos&unidade=tecon-santos&lista=lista-de-atracacao&atracadouro=TECON&dataInicial={date_time_str}')
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
@@ -259,6 +261,35 @@ def scraping_santosbrasil():
             atb_sb = elements[8].text
             ets_sb = elements[9].text
             ats_sb = elements[10].text
+            now = datetime.now()
+            date_time_str = now.strftime("%d/%m/%Y %H:%M:%S")
+            time = str(ets_sb).replace('\n','').replace('/n','')
+            ats_str_sb = str(ats_sb).replace('\n','').replace('/n','')
+            try:
+                time_dia = int(time[:2] + time[15:])
+                time_mes = time[:0] + time[3:]
+                time_mes_2 = int(time_mes[:2] + time_mes[15:])
+                time_ano = time[:0] + time[6:]
+                time_ano_2 = int(time_ano[:4] + time_ano[15:])
+                hora = time[:0] + time[10:]
+                hora_2 = int(hora[:2] + hora[10:])
+                min = int(time[:0] + time[13:])
+            except:
+                print("Não encontrado")
+            else:
+                date_and_time = datetime(time_ano_2, time_mes_2, time_dia, hora_2, min, 0)
+                date_time_sb = date_and_time.strftime("%Y%m%d%H%M%S")
+                now = datetime.now()
+                date_time_str = now.strftime("%Y%m%d%H%M%S")
+                if date_time_str > date_time_sb and ats_str_sb == '--':
+                    ate_and_time = datetime.datetime(time_ano_2, time_mes_2, time_dia, hora_2, min, 0)
+                    time_change = datetime.timedelta(minutes=360)
+                    new_time = date_and_time + time_change
+                    tempo_previsto_saida = new_time.strftime('%d/%m/%Y %H:%M:%S')
+                    atrasado = 1
+                else:
+                    atrasado = 0
+                    tempo_previsto_saida=''
             status_sb = navio.get('class')
             sleep(1)
             navios = navegador.find_elements(By.ID, 'tableRow')
@@ -279,7 +310,7 @@ def scraping_santosbrasil():
             ship_id = obter_ship_id(nome)
             dados = obter_dados_navio(ship_id)
             i = i + 1
-            registrar_sqlite(dados, eta_sb , ata_sb, berco_sb, emb_des_sb, emb_int_sb, des_int_sb)
+            registrar_sqlite(dados, eta_sb , ata_sb, berco_sb, emb_des_sb, emb_int_sb, des_int_sb, tempo_previsto_saida, atrasado)
             
 
 while('true'):
@@ -290,6 +321,6 @@ while('true'):
     criartabela_santosbrasil()
     scraping_fundeio()
     scraping_praticagem()
-    scraping_santosbrasil()
+    scraping_santosbrasil(date_time_str)
     sleep(300)
 
