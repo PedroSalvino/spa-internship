@@ -1,5 +1,4 @@
-# chamadas a api marinetraffic
-from marinetrafficapi import MarineTrafficApi
+# chamadas a api
 import requests
 
 # conexão ao firebase
@@ -20,12 +19,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 # scraping terminal
 from bs4 import BeautifulSoup
 
-#api = MarineTrafficApi(api_key='{chaveapi}')
-#url = 'https://services.marinetraffic.com/api/shipsearch/{api_key}?protocol=json&shipid={ship_id}'.format('{chavedaapi}, {iddonavio}')
 
 caminho_driver = r"chromedriver.exe"
 opcoes_chrome = webdriver.ChromeOptions()
-opcoes_chrome.add_argument('--headless')
+# opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
 app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2ebd8f787.json")
@@ -79,15 +76,17 @@ def obter_dados_navio(ship_id):
     return resultado
 
 # funcao para inserir registros no firebase
-def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
+def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco, movimentacao_total, movimentacao_embarque, movimentacao_descarga):
     estimado_terminal = str(estimado_terminal).replace('\n','').replace('/n','')
     estimado_terminal = datetime.strptime(estimado_terminal, '%d/%m/%Y%H:%M')
     estimado_terminal = estimado_terminal.strftime('%Y-%m-%d %H:%M:%S')
+
     try:
         chegada_terminal = str(chegada_terminal).replace('\n','').replace('/n','')
         chegada_terminal = datetime.strptime(chegada_terminal, '%d/%m/%Y%H:%M')
         chegada_terminal = chegada_terminal.strftime('%Y-%m-%d %H:%M:%S')
     except:
+        #caso a chegada não exista no site, ignorar a conversão. resultado = "--"
         pass
 
     if berco == "1":
@@ -125,6 +124,9 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         "imo":imo,
         "nome":nome,
         "calado":calado,
+        "movimentacao_embarque":movimentacao_embarque,
+        "movimentacao_descarga":movimentacao_descarga,
+        "movimentacao_total":movimentacao_total,
         "conteudo":dados
     })
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
@@ -142,12 +144,52 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         "imo":imo,
         "nome":nome,
         "calado":calado,
+        "movimentacao_embarque":movimentacao_embarque,
+        "movimentacao_descarga":movimentacao_descarga,
+        "movimentacao_total":movimentacao_total,
         "conteudo":dados
         })
-        
-while('true'):
-    now = datetime.today()
-    date_time_str = now.strftime("%Y-%m-%d")
+
+def scraping_praticagem():
+    navegador.get('https://www.sppilots.com.br/?cmd=SETPRT&prt=1')
+    try:
+        navegador.find_element(By.ID, 'userid').send_keys("46414915858")
+        navegador.find_element(By.ID, 'password').send_keys("46414915858")
+        navegador.find_element(By.ID, 'acordo').click()
+        navegador.find_element(By.ID, 'btLog').click()
+        print('logado')
+    except:
+        print("Sem login")
+    navegador.get('https://www.sppilots.com.br/?act=FUND')
+    sleep(5)
+    page_content = navegador.page_source
+    soup = BeautifulSoup(page_content, 'html.parser')
+    try:
+        navios = soup.find('div', attrs={'style': 'width: 100%;'}).findAll('tr')
+    except:
+        print("Não encontrado linha 113")
+    else:
+        for manobra in navios[1:]:
+            elements = manobra.findAll('td')
+            print(elements)
+            nome_prac_fund = elements[0].text
+            data_prac_fund = elements[1].text
+            data1,data2,data3 = str(data_prac_fund).partition(' ')
+            data1+=f'/{datetime.now().year}'
+            data1+=data2
+            data1+=data3
+            data_prac_fund = datetime.strptime(data1, '%d/%m/%Y %H:%M')
+            data_prac_fund = datetime.strftime(data_prac_fund, '%Y-%m-%d %H:%M:%S')
+            print(data_prac_fund)      
+            ships = firebase_db.collection("chegada_fundeio_navios")
+            ships.document(str(nome_prac_fund).replace(' ','_')).set({
+            'nome':nome_prac_fund,
+            'chegada_fundeio':data_prac_fund
+            })
+
+           
+
+def scraping_santosbrasil():
     navegador.get(f'https://www.santosbrasil.com.br/v2021/lista-de-atracacao?titulo=Tecon+Santos&unidade=tecon-santos&lista=lista-de-atracacao&atracadouro=TECON&dataInicial={date_time_str}')
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
@@ -156,6 +198,7 @@ while('true'):
     except:
         print('Não encontrado')
     else:
+        cont=0
         for navio in navios:
             elements = navio.findAll('td')
             berco_sb = elements[1].text
@@ -168,9 +211,32 @@ while('true'):
             atb_sb = elements[8].text
             ets_sb = elements[9].text
             ats_sb = elements[10].text
-            status_sb = navio.get('class')  
+            status_sb = navio.get('class')
+            sleep(1)
+            navios = navegador.find_elements(By.ID, 'tableRow')[cont].click()
+            cont += 1
+            page_content = navegador.page_source
+            soup = BeautifulSoup(page_content, 'html.parser')
+            embs_sb = soup.find('div', attrs={'class': 'col-12 div-infos-table2'}).findAll('tr')
+            emb_sb = embs_sb[10].find('strong').text
+            des_sb = embs_sb[10].find('td', attrs={'class': 'divisoria'}).find('strong').text
+            try:
+                emb_int_sb = int(emb_sb)
+                des_int_sb = int(des_sb)
+            except:
+                print("Sem valor")
+            else:
+                emb_des_sb = emb_int_sb + des_int_sb
+            sleep(1)
             ship_id = obter_ship_id(nome)
             dados = obter_dados_navio(ship_id)
-            registrar_firebase(dados, eta_sb , ata_sb, berco_sb)
-    sleep(300)
+            registrar_firebase(dados, eta_sb , ata_sb, berco_sb, emb_des_sb, emb_int_sb, des_int_sb)
             
+
+while('true'):
+    now = datetime.today()
+    date_time_str = now.strftime("%Y-%m-%d")
+    scraping_praticagem()
+    scraping_santosbrasil()
+    sleep(300)
+
