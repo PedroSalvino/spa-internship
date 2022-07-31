@@ -25,8 +25,9 @@ const santosBrasilChegada = {
   { "nome": "COSCO SHIPPING VISION", "mmsi": "477696900", "ultima_atualizacao": "31/07/2022 07:54:50", "chegada_marinetraffic": "27/07/2022 07:31:00", "chegada_terminal": "--", "berco": "1", "comprimento": "201.8", "comprimento_maximo": "245", "imo": "9881677", "calado": "7.5", "lat": "-23.97372", "lon": "-46.29359", "armador": "CPO             ", "movimentacao_embarque": "333", "movimentacao_descarga": "0", "movimentacao_total": "333", "chegada_saida": "", "atrasado": "0", "shipid": "6580745", "atracacao_prevista_terminal": "04/08/2022 10:30:00" },
   { "nome": "EVER URBAN", "mmsi": "357939000", "ultima_atualizacao": "31/07/2022 07:43:24", "chegada_marinetraffic": "30/07/2022 02:00:00", "chegada_terminal": "--", "berco": "3", "comprimento": "285", "comprimento_maximo": "350", "imo": "9169160", "calado": "11.3", "lat": "-25.63879", "lon": "-48.18372", "armador": "EMA             ", "movimentacao_embarque": "621", "movimentacao_descarga": "0", "movimentacao_total": "333", "chegada_saida": "", "atrasado": "0", "shipid": "1187574", "atracacao_prevista_terminal": "04/08/2022 01:00:00" },
   { "nome": "FERNAO DE MAGALHAES", "mmsi": "253414000", "ultima_atualizacao": "31/07/2022 07:56:42", "chegada_marinetraffic": "27/02/2022 12:45:00", "chegada_terminal": "--", "berco": "1", "comprimento": "138.5", "comprimento_maximo": "245", "imo": "9466697", "calado": "6.5", "lat": "51.31897", "lon": "3.212007", "armador": "ALI             ", "movimentacao_embarque": "621", "movimentacao_descarga": "0", "movimentacao_total": "333", "chegada_saida": "", "atrasado": "0", "shipid": "297882", "atracacao_prevista_terminal": "05/08/2022 01:00:00" },
-  { "nome": "CAP SAN LORENZO", "mmsi": "219096000", "ultima_atualizacao": "31/07/2022 08:09:28", "chegada_marinetraffic": "31/07/2022 00:15:00", "chegada_terminal": "--", "berco": "3", "comprimento": "333.2", "comprimento_maximo": "350", "imo": "9622227", "calado": "12.1", "lat": "-24.18368", "lon": "-46.37471", "armador": "HSG             ", "movimentacao_embarque": "1365", "movimentacao_descarga": "637", "movimentacao_total": "2002", "chegada_saida": "", "atrasado": "0", "shipid": "297177", "atracacao_prevista_terminal": "01/08/2022 21:30:00" }
-  ]
+  { "nome": "CAP SAN LORENZO", "mmsi": "219096000", "ultima_atualizacao": "31/07/2022 08:09:28", "chegada_marinetraffic": "31/07/2022 00:15:00", "chegada_terminal": "--", "berco": "3", "comprimento": "333.2", "comprimento_maximo": "350", "imo": "9622227", "calado": "12.1", "lat": "-24.18368", "lon": "-46.37471", "armador": "HSG             ", "movimentacao_embarque": "1365", "movimentacao_descarga": "637", "movimentacao_total": "2002", "chegada_saida": "", "atrasado": "0", "shipid": "297177", "atracacao_prevista_terminal": "01/08/2022 21:30:00" },
+  { "nome": "NORTHERN PRIORITY", "mmsi": "636091832", "ultima_atualizacao": "2022-07-31 09:39:07", "chegada_marinetraffic": "2022-07-31 09:27:00", "chegada_terminal": "2022-07-31 09:30:00", "berco": "1", "comprimento": "264.28", "comprimento_maximo": "245", "imo": "9450313", "calado": "10.2", "lat": "-23.9929", "lon": "-46.31256", "armador": "MSL             ", "movimentacao_embarque": "706", "movimentacao_descarga": "318", "movimentacao_total": "1024", "chegada_saida": "", "atrasado": "0", "shipid": "758281", "atracacao_prevista_terminal": "\n31\/07\/2022\n10:30\n" }
+]
 };    
 
 const praticagem = {
@@ -34,7 +35,9 @@ const praticagem = {
   "features": [
   { "nome": "STOLT OCELOT", "tempo_estimado": "05:40:00" }, 
   { "nome": "TRF MARQUETTE", "tempo_estimado": "05:40:00" }, 
-  { "nome": "CANADIAN HIGHWAY", "tempo_estimado": "06:10:00" }
+  { "nome": "CANADIAN HIGHWAY", "tempo_estimado": "06:10:00" },
+  { "nome": "NORTHERN PRIORITY", "tempo_estimado": "10:10:00" }
+  
   ]
 };
 
@@ -51,7 +54,7 @@ export default function Atracacao() {
         <Text style={styles.texto}>Berço: {item.berco}</Text>
         <Text style={styles.texto}>Quantidade de Container para Descarga: {item.movimentacao_descarga}</Text>
         <Text style={styles.texto}>Previsão de Atracação do Terminal: {item.atracacao_prevista_terminal}</Text>
-        <Text style={styles.texto}>Previsão de Chegada do Marine Traffic: {item.estimado_marinetraffic}</Text>
+        {(item.nome == "NORTHERN PRIORITY" ) ? <Text style={styles.texto}>Previsão de Chegada (PCS Santos e Praticagem): {praticagem.features[3].tempo_estimado}</Text> : ''}
         <Text style={styles.texto}>Atracação efetiva do terminal: {item.chegada_terminal}</Text>
         <Text style={styles.texto}>Loa: {item.comprimento}</Text>
         <Text style={styles.texto}>Comprimento do Berço: {item.comprimento_maximo}</Text>
@@ -91,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
   },
   titulo:{
-    color: '#6290C3',
+    color: '#CFCFEC',
     fontSize: 25,
     fontWeight: 500,
     textAlign: 'center'

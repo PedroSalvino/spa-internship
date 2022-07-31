@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 35,
   },
   titulo:{
-    color: '#6290C3',
+    color: '#CFCFEC',
     fontSize: 25,
     fontWeight: 500,
     textAlign: 'center'
