@@ -4,11 +4,11 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 export default function Home() {
  return (
    <View style={styles.container}>
-     <Text style={styles.titulo}>PCS Santos</Text>
+     
 
      <Image
-      source={{ uri: 'https://avatars.githubusercontent.com/u/52542914?v=4'}}
-      style={{ width: 300, height: 300}}
+      source={{ uri: 'https://raw.githubusercontent.com/PedroSalvino/spa-internship/mobile/mobile/pcssantos/src/assets/logo-pcs.png'}}
+      style={{ width: 150, height: 150, borderRadius: 30, marginHorizontal: 'auto'}}
      />
 
       <View>
