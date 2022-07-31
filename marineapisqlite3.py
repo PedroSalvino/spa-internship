@@ -66,13 +66,14 @@ def criartabela_santosbrasil():
     movimentacao_total TEXT,
     chegada_saida TEXT,
     atrasado TEXT,
-    shipid TEXT
+    shipid TEXT,
+    atracacao_prevista_terminal TEXT
     ) """)
     conn.commit()
 
 caminho_driver = r"chromedriver.exe"
 opcoes_chrome = webdriver.ChromeOptions()
-# opcoes_chrome.add_argument('--headless')
+opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
 
@@ -116,7 +117,7 @@ def obter_dados_navio(ship_id):
     resultado.update(query2.json())
     return resultado
 
-def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, berco, movimentacao_total, movimentacao_embarque, movimentacao_descarga, estimado_saida, atrasado):
+def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, berco, movimentacao_total, movimentacao_embarque, movimentacao_descarga, estimado_saida, atrasado, ship_id, etb_sb):
     estimado_terminal = str(estimado_terminal).replace('\n', '').replace('/n', '')
     estimado_terminal = datetime.strptime(estimado_terminal, '%d/%m/%Y%H:%M')
     estimado_terminal = estimado_terminal.strftime('%Y-%m-%d %H:%M:%S')
@@ -144,7 +145,6 @@ def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, ber
     lat = dados["lat"]
     lon = dados["lon"]
     calado = dados["draughtReported"]
-    shipid = dados["shipid"]
     timestamp = datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')
     if dados["arrivalPort"]["timestampLabel"] == "ETA":
         estimado_marine = datetime.fromtimestamp(
@@ -152,14 +152,14 @@ def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, ber
         estimado_marine = datetime.strftime(
             estimado_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{shipid}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{ship_id}')""")
         conn.commit()
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
         chegada_marine = datetime.fromtimestamp(
             dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil_chegada VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{shipid}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{ship_id}','{etb_sb}')""")
         conn.commit()
 
 
@@ -261,6 +261,7 @@ def scraping_santosbrasil(date_time_str):
             ata_sb = elements[6].text
             ets_sb = elements[9].text
             ats_sb = elements[10].text
+            etb_sb = elements[7].text
             now = datetime.now()
             date_time_str = now.strftime("%d/%m/%Y %H:%M:%S")
             time = str(ets_sb).replace('\n', '').replace('/n', '')
@@ -315,7 +316,7 @@ def scraping_santosbrasil(date_time_str):
             dados = obter_dados_navio(ship_id)
             cont = cont + 1
             registrar_sqlite(dados, armador_sb, eta_sb, ata_sb, berco_sb, emb_des_sb,
-                             emb_int_sb, des_int_sb, tempo_previsto_saida, atrasado)
+                             emb_int_sb, des_int_sb, tempo_previsto_saida, atrasado, ship_id, etb_sb)
 
 
 while('true'):
