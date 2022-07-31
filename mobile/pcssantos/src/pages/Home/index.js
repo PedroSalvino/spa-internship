@@ -11,14 +11,6 @@ export default function Home() {
       style={{ width: 350, height: 350, borderRadius: 30, marginHorizontal: 'auto'}}
      />
 
-      <View>
-        <Text></Text>
-      </View>
-
-     <View>
-      <Text>Marine Traffic</Text>
-
-     </View>
    </View>
   );
 }
