@@ -23,6 +23,7 @@ while('true'):
     except:
         print('Não encontrado')
     else:
+        cont = 0
         for navio in navios:
             elements = navio.findAll('td')
             berco_sb = elements[1].text
@@ -35,7 +36,40 @@ while('true'):
             atb_sb = elements[8].text
             ets_sb = elements[9].text
             ats_sb = elements[10].text
-            status_sb = navio.get('class')  
+            status_sb = navio.get('class')
+            sleep(1)
+            navios = navegador.find_elements(By.ID, 'tableRow')[cont].click()
+            cont += 1
+            page_content = navegador.page_source
+            soup = BeautifulSoup(page_content, 'html.parser')
+            embs_sb = soup.find('div', attrs={'class': 'col-12 div-infos-table2'}).findAll('tr')
+            emb_sb = embs_sb[10].find('strong').text
+            des_sb = embs_sb[10].find('td', attrs={'class': 'divisoria'}).find('strong').text
+            try:
+                emb_int_sb = int(emb_sb)
+                des_int_sb = int(des_sb)
+            except:
+                print("Sem valor")
+            else:
+                emb_des_sb = emb_int_sb + des_int_sb
+            sleep(1)
+            navegador.refresh()
+
+
+        # cont = 0
+        # for navio in navios:
+        #     sleep(5)
+        #     navio.find_element(By.XPATH, f'//*[@data-index="{cont}"]').click()
+        #     cont += 1
+        #     page_content = navegador.page_source
+        #     soup = BeautifulSoup(page_content, 'html.parser')
+        #     embs_sb = soup.find('div', attrs={'class': 'col-12 div-infos-table2'}).findAll('tr')
+        #     emb_sb = embs_sb[10].find('strong').text
+        #     print(emb_sb)
+        #     sleep(5)
+        #     navegador.refresh()
+            
+
     navegador.get('https://www.sppilots.com.br/?cmd=SETPRT&prt=1')
     navegador.find_element(By.ID, 'userid').send_keys("46414915858")
     navegador.find_element(By.ID, 'password').send_keys("46414915858")
@@ -64,4 +98,41 @@ while('true'):
                     tug_prac = elements[8].text
                 except:
                     print('Não encontrado')
+
+    navegador.get('https://www.sppilots.com.br/?act=TABMAR')
+    page_content = navegador.page_source
+    soup = BeautifulSoup(page_content, 'html.parser')
+    try:
+        navios = soup.find('td', attrs={'style': 'height: 1px;'}).findAll('tr', attrs={'style': 'height: 18px;'})
+    except:
+        print('Sem navios em manobra')
+    else:
+        for manobra in navios:
+            elements = manobra.findAll('td')
+            try:
+                horario_prac = elements[0].text
+                mare_prac = elements[1].text
+            except:
+                print('Não encontrado')
+
+    page = requests.get('https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracacoes-programadas/')
+    soup = BeautifulSoup(page.content, 'html.parser')
+    try:
+        navios = soup.find('div', attrs={'id': 'iniciodoconteudo'}).findAll('div', attrs={'style': 'overflow-x:auto;margin-bottom:20px;'})
+    except:
+        print('Não encontrado')
+    else:
+        for navio in navios:
+            navios_rows = navio.find('tbody').findAll('tr')
+            for navio_row in navios_rows:
+                elements = navio_row.findAll('td')
+                if elements[2].text == 'TECON':
+                    data_spa = elements[0].text
+                    hora_spa = elements[1].text
+                    local_spa = elements[2].text
+                    navio_spa = elements[3].text
+                    carga_spa = elements[4].text
+                    evento_spa = elements[5].text
+                    viagem_spa = elements[6].text
+                    duv_spa = elements[7].text
     sleep(300)  
