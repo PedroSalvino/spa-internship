@@ -3,12 +3,46 @@ import json
 import requests
 
 # conexão ao firebase
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore, db
+# import firebase_admin
+# from firebase_admin import credentials
+# from firebase_admin import firestore, db
+
+import sqlite3
+conn = sqlite3.connect('dados_scrape.sqlite3')
+c = conn.cursor()
+
+def criartabela_fundeio():
+    c.execute(""" CREATE TABLE IF NOT EXISTS output_fundeio (nome TEXT NOT NULL, chegada_fundeio TEXT NOT NULL) """)
+
+def criartabela_praticagem():
+    c.execute(
+    """ 
+    CREATE TABLE IF NOT EXISTS output_praticagem (
+	nome TEXT NOT NULL,
+	tempo_estimado TEXT NOT NULL
+    ) """)
+
+def criartabela_santosbrasil():
+    c.execute(
+    """ 
+    CREATE TABLE IF NOT EXISTS output_santosbrasil (
+	mmsi TEXT NOT NULL,
+	ultima_atualizacao TEXT,
+    estimado_marinetraffic TEXT,
+    estimado_terminal TEXT,
+    berco TEXT,
+    comprimento TEXT,
+    comprimento_maximo TEXT,
+    imo TEXT,
+    nome TEXT,
+    calado TEXT,
+    movimentacao_embarque TEXT,
+    movimentacao_descarga TEXT,
+    movimentacao_total TEXT
+    ) """)
+
 
 # datas, horarios e pausas
-import datetime
 from datetime import datetime, timedelta
 from time import sleep
 # coleta de shipid
@@ -25,10 +59,10 @@ opcoes_chrome = webdriver.ChromeOptions()
 opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
-app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2ebd8f787.json")
-ref = db.reference("/")
-firebase_admin.initialize_app(app_firebase)
-firebase_db = firestore.client()
+# app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2ebd8f787.json")
+# ref = db.reference("/")
+# firebase_admin.initialize_app(app_firebase)
+# firebase_db = firestore.client()
 
 
 # funcao para obtencao do shipid (marinetraffic)
@@ -182,13 +216,16 @@ def scraping_fundeio():
             data1+=data3
             data_prac_fund = datetime.strptime(data1, '%d/%m/%Y %H:%M')
             data_prac_fund = datetime.strftime(data_prac_fund, '%Y-%m-%d %H:%M:%S')
-            
-            print(data_prac_fund)      
-            ships = firebase_db.collection("chegada_fundeio_navios")
-            ships.document(str(nome_prac_fund).replace(' ','_')).set({
-            'nome':nome_prac_fund,
-            'chegada_fundeio':data_prac_fund
-            })
+            print(data_prac_fund)
+            # ships = firebase_db.collection("chegada_fundeio_navios")
+            # ships.document(str(nome_prac_fund).replace(' ','_')).set({
+            # 'nome':nome_prac_fund,
+            # 'chegada_fundeio':data_prac_fund
+            # })
+
+            c.execute(f"""INSERT INTO output_fundeio(nome,chegada_fundeio) VALUES
+            ('{nome_prac_fund}','{data_prac_fund}')""")
+            conn.commit()
 
 
            
@@ -233,12 +270,15 @@ def scraping_praticagem():
                 calado_prac = elements[6].text
                 bordo_prac = elements[7].text
                 tug_prac = elements[8].text
-                print('firebase')
-                ships = firebase_db.collection("estimativa_barra_berco")
-                ships.document(str(nome_prac).replace(' ','_')).set({
-                    'nome':nome_prac,
-                    'tempo_estimado':tempo_previsto
-                })
+
+                # ships = firebase_db.collection("estimativa_barra_berco")
+                # ships.document(str(nome_prac).replace(' ','_')).set({
+                #     'nome':nome_prac,
+                #     'tempo_estimado':tempo_previsto
+                # })
+
+                c.execute(f"""INSERT INTO output_praticagem(nome,tempo_estimado) VALUES
+                ({nome_prac},{tempo_previsto})""")
 
                 
 
@@ -287,11 +327,13 @@ def scraping_santosbrasil():
             
 
 while('true'):
+    criartabela_fundeio()
     now = datetime.today()
     date_time_str = now.strftime("%Y-%m-%d")
-    criar_tabe
+    criartabela_praticagem()
+    criartabela_santosbrasil()
     scraping_fundeio()
     scraping_praticagem()
-    scraping_santosbrasil()
+    # scraping_santosbrasil()
     sleep(300)
 
