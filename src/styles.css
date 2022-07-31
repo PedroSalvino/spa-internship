@@ -1,1 +1,36 @@
-/* Add application styles & imports to this file! */
+:root {
+  --primaria: #203864;
+  --secundaria: #6290c3;
+  --laranja: #fd7e35;
+  --claro: #fbfcff;
+}
+
+.bg-primaria {
+  background-color: var(--primaria);
+}
+.bg-secundaria {
+  background-color: var(--secundaria);
+}
+.bg-laranja {
+  background-color: var(--laranja);
+}
+.bg-claro {
+  background-color: var(--claro);
+}
+
+.bg-transparent {
+  background-color: transparent;
+}
+
+.text-primaria {
+  color: var(--primaria);
+}
+.text-secundaria {
+  color: var(--secundaria);
+}
+.text-laranja {
+  color: var(--laranja);
+}
+.text-claro {
+  color: var(--claro);
+}
