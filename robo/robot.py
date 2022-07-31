@@ -16,12 +16,13 @@ while('true'):
     now = datetime.today()
     date_time_str = now.strftime("%Y-%m-%d")
     navegador.get(f'https://www.santosbrasil.com.br/v2021/lista-de-atracacao?titulo=Tecon+Santos&unidade=tecon-santos&lista=lista-de-atracacao&atracadouro=TECON&dataInicial={date_time_str}')
+    sleep(5)
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
     try:
         navios = soup.find('table', attrs={'id': 'tableListaDeAtracacao'}).findAll('tr', attrs={'id': 'tableRow'})
     except:
-        print('Não encontrado')
+        print('Não encontrado linha 25')
     else:
         cont = 0
         for navio in navios:
@@ -55,26 +56,14 @@ while('true'):
             sleep(1)
             navegador.refresh()
 
-
-        # cont = 0
-        # for navio in navios:
-        #     sleep(5)
-        #     navio.find_element(By.XPATH, f'//*[@data-index="{cont}"]').click()
-        #     cont += 1
-        #     page_content = navegador.page_source
-        #     soup = BeautifulSoup(page_content, 'html.parser')
-        #     embs_sb = soup.find('div', attrs={'class': 'col-12 div-infos-table2'}).findAll('tr')
-        #     emb_sb = embs_sb[10].find('strong').text
-        #     print(emb_sb)
-        #     sleep(5)
-        #     navegador.refresh()
-            
-
     navegador.get('https://www.sppilots.com.br/?cmd=SETPRT&prt=1')
-    navegador.find_element(By.ID, 'userid').send_keys("46414915858")
-    navegador.find_element(By.ID, 'password').send_keys("46414915858")
-    navegador.find_element(By.ID, 'acordo').click()
-    navegador.find_element(By.ID, 'btLog').click()
+    try:
+        navegador.find_element(By.ID, 'userid').send_keys("46414915858")
+        navegador.find_element(By.ID, 'password').send_keys("46414915858")
+        navegador.find_element(By.ID, 'acordo').click()
+        navegador.find_element(By.ID, 'btLog').click()
+    except:
+        print("Sem login")
     navegador.get('https://www.sppilots.com.br/?act=MOVIM')
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
@@ -97,7 +86,7 @@ while('true'):
                     bordo_prac = elements[7].text
                     tug_prac = elements[8].text
                 except:
-                    print('Não encontrado')
+                    print('Não encontrado linha 89')
 
     navegador.get('https://www.sppilots.com.br/?act=TABMAR')
     page_content = navegador.page_source
@@ -113,14 +102,30 @@ while('true'):
                 horario_prac = elements[0].text
                 mare_prac = elements[1].text
             except:
-                print('Não encontrado')
+                print('Não encontrado linha 105')
+    
+    navegador.get('https://www.sppilots.com.br/?act=FUND')
+    page_content = navegador.page_source
+    soup = BeautifulSoup(page_content, 'html.parser')
+    try:
+        navios = soup.find('div', attrs={'style': 'width: 100%;'}).findAll('tr')
+    except:
+        print("Não encontrado linha 113")
+    else:
+        for manobra in navios:
+            elements = manobra.findAll('td')
+            try:
+                nome_prac_fund = elements[0].text
+                data_prac_fund = elements[1].text
+            except:
+                print('Não encontrado linha 122')
 
     page = requests.get('https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracacoes-programadas/')
     soup = BeautifulSoup(page.content, 'html.parser')
     try:
         navios = soup.find('div', attrs={'id': 'iniciodoconteudo'}).findAll('div', attrs={'style': 'overflow-x:auto;margin-bottom:20px;'})
     except:
-        print('Não encontrado')
+        print('Não encontrado linha 128')
     else:
         for navio in navios:
             navios_rows = navio.find('tbody').findAll('tr')
@@ -135,4 +140,4 @@ while('true'):
                     evento_spa = elements[5].text
                     viagem_spa = elements[6].text
                     duv_spa = elements[7].text
-    sleep(300)  
+    sleep(300)
