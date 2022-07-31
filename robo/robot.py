@@ -37,6 +37,34 @@ while('true'):
             atb_sb = elements[8].text
             ets_sb = elements[9].text
             ats_sb = elements[10].text
+            now = datetime.now()
+            date_time_str = now.strftime("%d/%m/%Y %H:%M:%S")
+            time = str(ets_sb).replace('\n','').replace('/n','')
+            ats_str_sb = str(ats_sb).replace('\n','').replace('/n','')
+            try:
+                time_dia = int(time[:2] + time[15:])
+                time_mes = time[:0] + time[3:]
+                time_mes_2 = int(time_mes[:2] + time_mes[15:])
+                time_ano = time[:0] + time[6:]
+                time_ano_2 = int(time_ano[:4] + time_ano[15:])
+                hora = time[:0] + time[10:]
+                hora_2 = int(hora[:2] + hora[10:])
+                min = int(time[:0] + time[13:])
+            except:
+                print("Não encontrado")
+            else:
+                date_and_time = datetime(time_ano_2, time_mes_2, time_dia, hora_2, min, 0)
+                date_time_sb = date_and_time.strftime("%Y%m%d%H%M%S")
+                now = datetime.now()
+                date_time_str = now.strftime("%Y%m%d%H%M%S")
+                if date_time_str > date_time_sb and ats_str_sb == '--':
+                    ate_and_time = datetime.datetime(time_ano_2, time_mes_2, time_dia, hora_2, min, 0)
+                    time_change = datetime.timedelta(minutes=360)
+                    new_time = date_and_time + time_change
+                    tempo_previsto_saida = new_time.strftime('%d/%m/%Y %H:%M:%S')
+                    atrasado = 1
+                else:
+                    atrasado = 0
             status_sb = navio.get('class')
             sleep(1)
             navios = navegador.find_elements(By.ID, 'tableRow')[cont].click()
@@ -74,7 +102,7 @@ while('true'):
     else:
         for manobra in navios:
             elements = manobra.findAll('td')
-            if elements[1].text == 'S':
+            if elements[1].text == 'E':
                 try:
                     nome_prac = elements[0].text
                     mov_prac = elements[1].text
@@ -86,10 +114,10 @@ while('true'):
                     min_prac = pob_hr_prac[:0] + pob_hr_prac[3:]
                     hr_int_prac = int(hr_prac)
                     min_int_prac = int(min_prac)
-                    date_and_time = datetime.datetime(2022, 1, 1, hr_int_prac, min_int_prac)
+                    date_and_time = datetime.datetime(2022, 1, 1, hr_int_prac, min_int_prac, 0)
                     time_change = datetime.timedelta(minutes=40)
                     new_time = date_and_time + time_change
-                    tempo_previsto = new_time.strftime('%H:%M')
+                    tempo_previsto = new_time.strftime('%H:%M:%S')
                     passag_prac = elements[5].text
                     calado_prac = elements[6].text
                     bordo_prac = elements[7].text
@@ -121,13 +149,10 @@ while('true'):
     except:
         print("Não encontrado linha 122")
     else:
-        for manobra in navios:
+        for manobra in navios[1:]:
             elements = manobra.findAll('td')
-            try:
-                nome_prac_fund = elements[0].text
-                data_prac_fund = elements[1].text
-            except:
-                print('Não encontrado linha 130')
+            nome_prac_fund = elements[0].text
+            data_prac_fund = elements[1].text
 
     page = requests.get('https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/navegacao-e-movimento-de-navios/atracacoes-programadas/')
     soup = BeautifulSoup(page.content, 'html.parser')
