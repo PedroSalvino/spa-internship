@@ -1,3 +1,8 @@
-# angular-ivy-mqhwlt
+Equipe SPA InternShip
 
-[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/angular-ivy-mqhwlt)
+* André Galdino
+* Lucas Gomes
+* Matheus Vicente
+* Pedro Salvino
+* Rafael Osidacz
+
