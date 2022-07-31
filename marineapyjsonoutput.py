@@ -26,10 +26,8 @@ opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
 app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2ebd8f787.json")
-ref = db.reference("/")
 firebase_admin.initialize_app(app_firebase)
 firebase_db = firestore.client()
-
 
 # funcao para obtencao do shipid (marinetraffic)
 def obter_ship_id(nome):
@@ -130,7 +128,28 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco, movime
         "movimentacao_descarga":movimentacao_descarga,
         "movimentacao_total":movimentacao_total,
         "conteudo":dados
-    })
+        })
+
+        sett = ({
+        "mmsi": mmsi2,
+        "ultima_atualizacao":timestamp,
+        "estimado_marinetraffic":estimado_marine,
+        "estimado_terminal":estimado_terminal,
+        "berco":berco,
+        "comprimento":comprimento,
+        "comprimento_maximo":comprimento_maximo,
+        "imo":imo,
+        "nome":nome,
+        "calado":calado,
+        "movimentacao_embarque":movimentacao_embarque,
+        "movimentacao_descarga":movimentacao_descarga,
+        "movimentacao_total":movimentacao_total,
+        "conteudo":dados
+        })
+
+        with open(f'santosbrasil//output.json', 'w') as f:
+            json.dump(sett, f)        
+
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
         chegada_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
@@ -166,6 +185,7 @@ def scraping_fundeio():
     sleep(5)
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
+    i=0
     try:
         navios = soup.find('div', attrs={'style': 'width: 100%;'}).findAll('tr')
     except:
@@ -190,6 +210,14 @@ def scraping_fundeio():
             'chegada_fundeio':data_prac_fund
             })
 
+            sett = ({
+                'nome':nome_prac_fund,
+                'tempo_estimado':data_prac_fund
+            })
+
+            with open(f'fundeio//output{i}.json', 'w') as f:
+                    json.dump(sett, f)
+            i+=1
 
            
 def scraping_praticagem():
@@ -205,6 +233,7 @@ def scraping_praticagem():
     navegador.get('https://www.sppilots.com.br/?act=MOVIM')
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
+    i=0
     try:
         navios = soup.find('table', attrs={'style': 'width: 100%;'}).findAll('tr', attrs={'style': 'background:#00BFFF;'})
     except:
@@ -239,6 +268,14 @@ def scraping_praticagem():
                     'nome':nome_prac,
                     'tempo_estimado':tempo_previsto
                 })
+                sett = ({
+                    'nome':nome_prac,
+                    'tempo_estimado':tempo_previsto
+                })
+
+                with open(f'praticagem//output{i}.json', 'w') as f:
+                    json.dump(sett, f)
+                i+=1
 
                 
 
@@ -289,9 +326,8 @@ def scraping_santosbrasil():
 while('true'):
     now = datetime.today()
     date_time_str = now.strftime("%Y-%m-%d")
-    criar_tabe
     scraping_fundeio()
     scraping_praticagem()
-    scraping_santosbrasil()
+    # scraping_santosbrasil()
     sleep(300)
 
