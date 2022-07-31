@@ -314,7 +314,10 @@ def scraping_santosbrasil(date_time_str):
             
 
 while('true'):
-    obter_ship_id('SAN FELIPE')
+    ship_id = obter_ship_id('SAN FELIPE')
+    resultado = {}
+    resultado = obter_dados_navio(ship_id)
+    registrar_sqlite(resultado)
     criartabela_fundeio()
     now = datetime.today()
     date_time_str = now.strftime("%Y-%m-%d")
