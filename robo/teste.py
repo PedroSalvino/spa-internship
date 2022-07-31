@@ -39,6 +39,27 @@ def criartabela_santosbrasil():
     estimado_saida TEXT,
     atrasado TEXT
     ) """)
+    c.execute(
+    """ 
+    CREATE TABLE IF NOT EXISTS output_santosbrasil_chegada (
+    nome TEXT PRIMARY KEY,
+	mmsi TEXT NOT NULL,
+	ultima_atualizacao TEXT,
+    chegada_marinetraffic TEXT,
+    chegada_terminal TEXT,
+    berco TEXT,
+    comprimento TEXT,
+    comprimento_maximo TEXT,
+    imo TEXT,
+    calado TEXT,
+    lat TEXT,
+    lon TEXT,
+    movimentacao_embarque TEXT,
+    movimentacao_descarga TEXT,
+    movimentacao_total TEXT,
+    chegada_saida TEXT,
+    atrasado TEXT
+    ) """)
 
 
 # datas, horarios e pausas
@@ -55,7 +76,7 @@ from bs4 import BeautifulSoup
 
 caminho_driver = r"chromedriver.exe"
 opcoes_chrome = webdriver.ChromeOptions()
-opcoes_chrome.add_argument('--headless')
+# opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
 
@@ -65,6 +86,7 @@ def obter_ship_id(nome):
 
     print(nome)
     navio = nome.replace(' ','%20')
+    navio = nome.replace('-','%20')
     url = 'https://www.marinetraffic.com/en/data/?asset_type=vessels&columns=flag,shipname,photo,recognized_next_port,reported_eta,reported_destination,current_port,imo,ship_type,show_on_live_map,time_of_latest_position,lat_of_latest_position,lon_of_latest_position,notes&quicksearch|begins|quicksearch={}'.format(navio)
     navegador.get(url)
     sleep(5)
@@ -146,12 +168,12 @@ def registrar_sqlite(dados, estimado_terminal, chegada_terminal, berco, moviment
         estimado_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         estimado_marine = datetime.strftime(estimado_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}'))""")
+        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}')""")
         conn.commit()
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
         chegada_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
-        c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
+        c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil_chegada VALUES
         ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}')""")
         conn.commit()
 
@@ -241,14 +263,16 @@ def scraping_praticagem():
 
 def scraping_santosbrasil(date_time_str):
     navegador.get(f'https://www.santosbrasil.com.br/v2021/lista-de-atracacao?titulo=Tecon+Santos&unidade=tecon-santos&lista=lista-de-atracacao&atracadouro=TECON&dataInicial={date_time_str}')
+    data_atual_sb = date_time_str
     page_content = navegador.page_source
     soup = BeautifulSoup(page_content, 'html.parser')
+    sleep(1)
     try:
         navios = soup.find('table', attrs={'id': 'tableListaDeAtracacao'}).findAll('tr', attrs={'id': 'tableRow'})
     except:
         print('Não encontrado')
     else:
-        i=0
+        cont = 0
         for navio in navios:
             elements = navio.findAll('td')
             berco_sb = elements[1].text
@@ -291,9 +315,9 @@ def scraping_santosbrasil(date_time_str):
                     atrasado = 0
                     tempo_previsto_saida=''
             status_sb = navio.get('class')
-            sleep(1)
-            navios = navegador.find_elements(By.ID, 'tableRow')
-            navios[i].click()
+            navegador.get(f'https://www.santosbrasil.com.br/v2021/lista-de-atracacao?titulo=Tecon+Santos&unidade=tecon-santos&lista=lista-de-atracacao&atracadouro=TECON&dataInicial={data_atual_sb}')
+            sleep(5)
+            navegador.find_elements(By.ID, 'tableRow')[cont].click()
             page_content = navegador.page_source
             soup = BeautifulSoup(page_content, 'html.parser')
             embs_sb = soup.find('div', attrs={'class': 'col-12 div-infos-table2'}).findAll('tr')
@@ -307,17 +331,14 @@ def scraping_santosbrasil(date_time_str):
             else:
                 emb_des_sb = emb_int_sb + des_int_sb
             sleep(1)
+            navegador.refresh()
             ship_id = obter_ship_id(nome)
             dados = obter_dados_navio(ship_id)
-            i = i + 1
+            cont = cont + 1
             registrar_sqlite(dados, eta_sb , ata_sb, berco_sb, emb_des_sb, emb_int_sb, des_int_sb, tempo_previsto_saida, atrasado)
             
 
 while('true'):
-    ship_id = obter_ship_id('SAN FELIPE')
-    resultado = {}
-    resultado = obter_dados_navio(ship_id)
-    registrar_sqlite(resultado)
     criartabela_fundeio()
     now = datetime.today()
     date_time_str = now.strftime("%Y-%m-%d")
