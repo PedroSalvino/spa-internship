@@ -14,13 +14,13 @@ const icons = {
     name: 'home',
   },
   Chegada:{
-    name: 'door',
+    name: 'sign-in',
   },
   Atracacao:{
-    name: 'stop',
+    name: 'ship',
   },
   Ocupacao:{
-    name: 'stop',
+    name: 'history',
   },
 }
 
