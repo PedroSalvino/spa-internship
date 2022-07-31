@@ -89,11 +89,24 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         chegada_terminal = chegada_terminal.strftime('%Y-%m-%d %H:%M:%S')
     except:
         pass
+
+    if berco == "1":
+        comprimento_maximo=245
+    elif berco == "2":
+        comprimento_maximo=383
+    elif berco =="3":
+        comprimento_maximo=350
+    # fonte: https://www.portodesantos.com.br/informacoes-operacionais/operacoes-portuarias/calados-operacionais-dos-bercos-de-atracacao/
+    
     mmsi = (str({dados["mmsi"]}))
     mmsi2 = "".join(str(mmsi))
     mmsi2 = mmsi2.replace('{','')
     mmsi2 = mmsi2.replace('}','')
     timestamp = datetime.fromtimestamp(dados["lastPos"])
+    comprimento = dados["length"]
+    imo = dados["imo"]
+    nome = dados["name"]
+    calado = dados["draughtReported"]
     timestamp = datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')
     print(timestamp)
     print(dados)
@@ -107,6 +120,11 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         "estimado_marinetraffic":estimado_marine,
         "estimado_terminal":estimado_terminal,
         "berco":berco,
+        "comprimento":comprimento,
+        "comprimento_maximo":comprimento_maximo,
+        "imo":imo,
+        "nome":nome,
+        "calado":calado,
         "conteudo":dados
     })
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
@@ -119,7 +137,12 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         "chegada_marinetraffic":chegada_marine,
         "chegada_terminal":chegada_terminal,
         "berco":berco,
-        "conteudo":dados 
+        "comprimento":comprimento,
+        "comprimento_maximo":comprimento_maximo,
+        "imo":imo,
+        "nome":nome,
+        "calado":calado,
+        "conteudo":dados
         })
         
 while('true'):
