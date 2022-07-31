@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 
 caminho_driver = r"chromedriver.exe"
 opcoes_chrome = webdriver.ChromeOptions()
-# opcoes_chrome.add_argument('--headless')
+opcoes_chrome.add_argument('--headless')
 opcoes_chrome.binary_location = r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe"
 navegador = webdriver.Chrome(caminho_driver, options=opcoes_chrome)
 app_firebase = credentials.Certificate(r"movim-navios-firebase-adminsdk-d5d4r-e2ebd8f787.json")
