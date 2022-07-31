@@ -1,3 +1,4 @@
+import datetime
 from datetime import datetime
 pob_prac = '30/07 14:00'
 pob_hr_prac = pob_prac[:0] + pob_prac[6:]
