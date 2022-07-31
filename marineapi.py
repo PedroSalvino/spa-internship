@@ -113,8 +113,8 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
     if dados["arrivalPort"]["timestampLabel"] == "ETA":
         estimado_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         estimado_marine = datetime.strftime(estimado_marine, '%Y-%m-%d %H:%M:%S')
-        ships = firebase_db.collection("comparacao_estimacao_navios")
-        ships.document(mmsi2).set({
+        ships = firebase_db.collection("comparacao_estimativa_navios")
+        ships.document(str(nome).replace(' ','_')).set({
         "mmsi": mmsi2,
         "ultima_atualizacao":timestamp,
         "estimado_marinetraffic":estimado_marine,
@@ -131,7 +131,7 @@ def registrar_firebase(dados, estimado_terminal, chegada_terminal, berco):
         chegada_marine = datetime.fromtimestamp(dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
         ships = firebase_db.collection("comparacao_chegada_navios")
-        ships.document(mmsi2).set({
+        ships.document(str(nome).replace(' ','_')).set({
         "mmsi": mmsi2,
         "ultima_atualizacao":timestamp,
         "chegada_marinetraffic":chegada_marine,
