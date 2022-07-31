@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "pcssantos",
+    "slug": "pcssantos",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
