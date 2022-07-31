@@ -144,6 +144,7 @@ def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, ber
     lat = dados["lat"]
     lon = dados["lon"]
     calado = dados["draughtReported"]
+    shipid = dados["shipid"]
     timestamp = datetime.strftime(timestamp, '%Y-%m-%d %H:%M:%S')
     if dados["arrivalPort"]["timestampLabel"] == "ETA":
         estimado_marine = datetime.fromtimestamp(
@@ -151,14 +152,14 @@ def registrar_sqlite(dados, armador_sb, estimado_terminal, chegada_terminal, ber
         estimado_marine = datetime.strftime(
             estimado_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{estimado_marine}','{estimado_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{shipid}')""")
         conn.commit()
     elif dados["arrivalPort"]["timestampLabel"] == "ATA":
         chegada_marine = datetime.fromtimestamp(
             dados["arrivalPort"]["timestamp"])
         chegada_marine = datetime.strftime(chegada_marine, '%Y-%m-%d %H:%M:%S')
         c.execute(f"""INSERT OR REPLACE INTO output_santosbrasil_chegada VALUES
-        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}')""")
+        ('{nome}','{mmsi2}','{timestamp}','{chegada_marine}','{chegada_terminal}','{berco}','{comprimento}','{comprimento_maximo}','{imo}','{calado}','{lat}','{lon}','{armador_sb}','{movimentacao_embarque}','{movimentacao_descarga}','{movimentacao_total}','{estimado_saida}','{atrasado}','{shipid}')""")
         conn.commit()
 
 
